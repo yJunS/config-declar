@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    environment {
+        fy = '翻译'
+        yc    = '原创'
+    }
+    
+    stages {
+        stage('Stage 1') {
+            steps {
+                script {
+                    sh "date  +%Y-%m-%d > today"
+                    today = readFile('today').trim()
+                    sh "date +%Y-%m-%d --date='1 day'  > tomrow"
+                    tomrow = readFile('tomrow').trim()
+                    
+                    sh 'curl -s https://api.github.com/search/issues?q=repo:jenkins-zh/jenkins-zh+type:pr+is:open+team-review-requested:social-media-admin+review:none > gitData.json'
+                    props = readJSON file: 'gitData.json'
+                    for(i=0; i< props.items.size(); i++ ){
+                        if((props.items[i].title.contains(fy) && props.items[i].title.contains(today)) || (props.items[i].title.contains(fy) && props.items[i].title.contains(tomrow)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(today)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(tomrow))) {
+                            echo "${props.items[i].html_url}"
+                        }
+                        
+                    }
+                }
+            }
+        }
+    }
+}
