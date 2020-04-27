@@ -3,6 +3,7 @@ pipeline {
     environment {
         fy = '翻译'
         yc    = '原创'
+        Integer initValue = 0
     }
     
     stages {
@@ -11,7 +12,7 @@ pipeline {
                 script {
                     sh "date  +%Y-%m-%d > today"
                     today = readFile('today').trim()
-                    sh "date +%Y-%m-%d --date='1 day'  > tomrow"
+                    sh "date -v +1d +%Y-%m-%d  > tomrow" //ubuntu is date +%Y-%m-%d --date='1 day'
                     tomrow = readFile('tomrow').trim()
                     
                     sh 'curl -s https://api.github.com/search/issues?q=repo:jenkins-zh/jenkins-zh+type:pr+is:open+team-review-requested:social-media-admin+review:none > gitData.json'
@@ -19,10 +20,20 @@ pipeline {
                     for(i=0; i< props.items.size(); i++ ){
                         if((props.items[i].title.contains(fy) && props.items[i].title.contains(today)) || (props.items[i].title.contains(fy) && props.items[i].title.contains(tomrow)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(today)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(tomrow))) {
                             echo "${props.items[i].html_url}"
+                            initValue = initValue+1
+                            echo '${env.initValue}'
                         }
                         
                     }
+                    echo 'abc'
+                    
                 }
+            }
+        }
+        
+        stage('send Email'){
+            steps{
+                echo '${env.initValue}'
             }
         }
     }
