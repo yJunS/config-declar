@@ -20,7 +20,7 @@ pipeline {
                     for(i=0; i< props.items.size(); i++ ){
                         if((props.items[i].title.contains(fy) && props.items[i].title.contains(today)) || (props.items[i].title.contains(fy) && props.items[i].title.contains(tomrow)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(today)) || (props.items[i].title.contains(yc) && props.items[i].title.contains(tomrow))) {
                             echo "${props.items[i].html_url}"
-                            initValue = initValue+1
+                            initValue++
                             echo '${env.initValue}'
                         }
                         
